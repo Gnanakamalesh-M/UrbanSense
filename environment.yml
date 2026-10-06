@@ -1,0 +1,59 @@
+# UrbanSense — conda environment (SPEC section 39).
+#
+#   conda env create -f environment.yml
+#   conda activate urbansense
+#   python -m pip install -e . --no-deps
+#
+# The last step is deliberate: conda installs the dependencies, pip installs
+# *this* package into the environment without touching them again. Letting pip
+# resolve dependencies here would shadow the conda builds with wheels and give
+# you two numpy stacks.
+#
+# Floors match pyproject.toml exactly. They are floors rather than pins because
+# the project is tested on 3.11 (CI) and 3.14 (development) and a pin that
+# satisfied one would break the other; `pip freeze` is the right tool if you
+# need a byte-identical environment.
+#
+# pytest, ruff and mypy come from conda-forge; httpx, shap and streamlit come
+# through pip because their conda-forge builds lag the wheels and this project
+# needs recent ones on 3.14.
+
+name: urbansense
+channels:
+  - conda-forge
+dependencies:
+  # CI pins 3.11; pyproject declares >=3.11.
+  - python=3.11
+
+  # Runtime. scikit-learn's HistGradientBoostingRegressor handles NaN natively,
+  # which is what lets missing values stay missing instead of being imputed.
+  - pydantic>=2.7
+  - pyyaml>=6.0
+  - python-dotenv>=1.0
+  - scikit-learn>=1.5
+  - numpy>=1.26
+  - scipy>=1.11
+
+  # The read-only API layer (SPEC section 44).
+  - fastapi>=0.115
+  - uvicorn>=0.30
+
+  # Development and CI.
+  - pytest>=8.0
+  - pytest-cov>=5.0
+  - ruff>=0.6
+  - mypy>=1.11
+  - types-PyYAML>=6.0
+
+  - pip
+  - pip:
+      # starlette's TestClient transport. Test-only: the API never imports it.
+      - httpx>=0.27
+      # The dashboard (SPEC section 43). Brings pandas, pyarrow, altair and
+      # pydeck, which is where the charts and the zone map come from -- no
+      # chart library is declared separately.
+      - streamlit>=1.40
+      # Optional. shap ships a cp312-abi3 wheel, so 3.11 and 3.14 cannot be
+      # guaranteed the same version; the explainer falls back to NaN-occlusion
+      # when it is absent and records which method ran.
+      - shap>=0.46

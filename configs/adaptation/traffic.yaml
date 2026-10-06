@@ -1,0 +1,119 @@
+# Adaptive learning: when a challenger may replace the champion (SPEC sections 30, 32).
+#
+#   Deploy the new model only if it satisfies predefined validation criteria.
+#   Otherwise: REJECT CANDIDATE, KEEP CURRENT MODEL
+#
+# "Predefined" is the operative word, so the rules live here rather than in code.
+# A margin chosen after looking at a challenger's score is not a criterion, it is
+# a rationalisation, and every promotion made under it would be suspect.
+
+monitoring:
+  # How far the replay advances between drift evaluations, and how far back each
+  # evaluation looks. Weekly keeps roughly 650 rows per window on this dataset:
+  # enough for a stable PSI, short enough to notice a shift within days.
+  step_days: 7
+  window_days: 7
+
+  # Features compared distributionally. Measured rather than assumed -- see the
+  # table in src/urbansense/drift/monitor.py for what each candidate scored.
+  # Features whose averaging window is at least window_days are rejected
+  # automatically: they are near-constant within a window, so PSI measures the
+  # packing of the reference quantiles rather than the city.
+  watched_features:
+    - roll_mean_24h
+
+  # Standard deviations above the reference mean for the prediction and
+  # performance gates. Three keeps the stable stretch silent: its MAE ratios
+  # average 1.67 with a standard deviation of 0.05.
+  sigma_multiplier: 3.0
+
+  # Reference windows needed before a sigma gate means anything. A three-sigma
+  # gate estimated from two numbers is not a gate; below this the detector
+  # reports insufficient_reference rather than firing or staying quiet.
+  min_reference_windows: 4
+
+  # Which drift families may raise a candidate. Measured against a drift-free
+  # copy of the dataset -- same seed, the level shift switched off:
+  #
+  #   family             drifted   drift-free
+  #   feature                 16           15
+  #   performance             16           10
+  #   prediction              15            0
+  #
+  # Feature and performance drift fire on both streams, because the generator
+  # has annual seasonality: a champion trained on autumn is genuinely worse by
+  # spring with nothing changed in the city. Only prediction drift separates a
+  # changed city from a model out of season, so it is the only family allowed to
+  # act. The others are still detected and logged -- performance drift fires a
+  # week earlier and is a useful leading indicator -- but acting on them alone
+  # would retrain the model every spring.
+  candidate_kinds:
+    - prediction
+
+  # Consecutive firings are one drift episode. A continuing episode may raise a
+  # second candidate only after this long, because the planted shift keeps PSI
+  # above its gate for fifteen straight weeks and fifteen retrains is not an
+  # answer to one change in the city.
+  cooldown_days: 28
+
+candidates:
+  # Windows a challenger is trained on. Both are tried per candidate and the
+  # promotion rules choose, so the window question is settled by evidence.
+  #
+  # Measured at the 2026-03-12 decision point, evaluating after a 168h gap:
+  #   expanding (all data to the decision)  MAE 236.1  (-15.4% vs champion)
+  #   recent 60 days                        MAE 257.3  (- 7.8%)
+  #   recent 30 days                        MAE 259.4  (- 7.0%)
+  #
+  # The textbook "forget the old regime" answer loses here, because this drift
+  # is a level shift the lag features already track: nothing needs forgetting,
+  # and more data helps the rare Friday pattern that has few examples.
+  training_windows:
+    - name: expanding
+      days: null # everything available at the decision time
+    - name: recent_60d
+      days: 60
+
+  # Hours excluded between the challenger's training data and the window it is
+  # judged on. One week, matching the feature set's furthest backward reach, so
+  # a training row and an evaluation row can never share an input.
+  gap_hours: 168
+
+  # How long the evaluation window is. Four weeks cuts the week-to-week MAE
+  # noise roughly in half against a single week.
+  evaluation_days: 28
+
+promotion:
+  # Relative MAE improvement a challenger must show to be promoted.
+  #
+  # Derived from the reference period's own variability, never from the window
+  # the challenger is judged on. Week-to-week MAE on the stable stretch has a
+  # coefficient of variation of 3.2%; a four-week evaluation window cuts that to
+  # roughly 1.6%, so 3% sits above the noise floor and well below the 7-15%
+  # signal a real adaptation produced. Picking it by looking at the challenger's
+  # score would invalidate every promotion it allowed.
+  min_relative_mae_improvement: 0.03
+
+  # A challenger may not be materially worse on a protected slice even when its
+  # overall error improves. An average can hide a slice getting much worse, and
+  # the Friday evening peak is the slice that matters operationally.
+  max_slice_regression: 0.05
+  protected_slices:
+    - ZONE-B Fri 18-20
+    - ZONE-A Fri 18-20
+
+  # Protected slices below this many rows are reported as too thin to judge
+  # rather than used to block a promotion. The Friday window yields only 8-10
+  # rows in four weeks, and a rule that can be decided by two observations is
+  # not a safeguard, it is a coin toss.
+  min_slice_rows: 8
+
+  # Minimum rows in the evaluation window. Below this, no decision is made and
+  # the champion is kept by default.
+  min_evaluation_rows: 200
+
+  # A challenger that fails the leakage probe is rejected outright. Never
+  # promoted, never silently dropped -- the rejection is recorded with the
+  # finding, because a leaky model that scores well is the most dangerous
+  # outcome available.
+  require_leakage_clean: true

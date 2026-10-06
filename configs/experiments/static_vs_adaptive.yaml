@@ -1,0 +1,79 @@
+# Static vs scheduled retrain vs adaptive (SPEC section 38).
+#
+#   Report results honestly. Do not cherry-pick favorable results.
+#
+# PRE-REGISTERED. This file is committed before the experiment is first run and
+# is copied verbatim into every report. That is the whole point: a threshold
+# chosen after seeing a result is not a criterion, and an experiment whose
+# parameters moved during analysis cannot be read as evidence. If a number here
+# needs to change, it changes in a commit of its own, with a reason, and every
+# arm is re-run.
+pre_registered: "2026-10-04"
+
+description: >
+  Three arms replayed over the same stream, scored on the same rows. Phase 7
+  compared adaptive against a model that never retrains, which is a weak
+  baseline -- the cheap alternative is retraining on a calendar. This adds that
+  arm so the question becomes "is drift-triggered retraining worth it, including
+  its extra cost?" rather than "is retraining better than not retraining?".
+
+arms:
+  # (a) Frozen pre-drift champion. Never retrained.
+  - static
+  # (b) Retrain every `retrain_every_days`, deploy unconditionally. The fair
+  #     baseline.
+  - scheduled
+  # (c) Phase 7's drift -> candidate -> promotion-rules system.
+  - adaptive
+
+# Five generator seeds. One dataset is an anecdote: with a single seed there is
+# no way to tell a real difference between arms from the luck of one draw, so
+# every figure is reported as mean +/- sd across seeds. Five is a compromise
+# between that and a 12-minute run.
+seeds: [20260101, 20260202, 20260303, 20260404, 20260505]
+
+# The scheduled arm's calendar. Four weeks is the same cadence as the adaptive
+# arm's candidate cooldown, so neither arm is handed more opportunities to
+# retrain than the other -- the difference between them is *what triggers* a
+# retrain, not how often one is allowed.
+retrain_every_days: 28
+
+# The window the scheduled arm trains on. Expanding means "all data available at
+# that date", which is what a scheduled retrain does in practice. It is one fit
+# per retrain against the adaptive arm's two per candidate, and that difference
+# is reported in the cost column rather than hidden.
+#
+# It cannot be chosen by evaluating both and taking the better one: that would
+# be peeking at the evaluation window, which is exactly what the adaptive arm's
+# promotion rules are allowed to do and the unconditional baseline is not.
+scheduled_window: expanding
+
+# Replay geometry, as spans from the start of each generated stream so a
+# different seed cannot silently change what is measured.
+#
+# The reference window begins where training ends: an overlapping reference is
+# partly in-sample, which understates the reference error and floods the drift
+# monitor with false alarms (Phase 7 measured 17 on a drift-free stream).
+train_days: 75
+reference_days: 60
+
+# Days of stream to replay after the reference window. Null means "to the end of
+# the generated history".
+replay_days: null
+
+# Metrics computed per arm. Cost is in the list deliberately: an accuracy table
+# without it would let the most expensive arm look best for free.
+metrics:
+  - mae
+  - rmse
+  - slice_mae # per zone, and each zone's Friday 18:00-20:00
+  - congestion_prf # precision / recall / F1 at the train-only threshold
+  - brier
+  - cost # retrains, model fits, training rows consumed
+
+# Promotion margin, training windows, drift gates and the cooldown are NOT
+# redeclared here. They come from configs/adaptation/traffic.yaml, fixed in
+# Phase 7 before any of these results existed. Restating them would invite the
+# two files to diverge and would make it unclear which one the run obeyed; the
+# report records the path it read and that file's contents instead.
+adaptation_config: configs/adaptation/traffic.yaml

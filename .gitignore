@@ -1,0 +1,57 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# --- Tooling caches ---
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# --- Secrets / local config ---
+.env
+.env.local
+
+# --- Data: raw and derived data are not versioned, but the tree is kept ---
+# data/sample/ IS tracked in full -- the generated demo dataset is committed so
+# the repo is demonstrable offline on clone (SPEC section 48). It is reproducible
+# byte for byte with:  python scripts/generate_demo_data.py --out data/sample
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/README.md
+data/processed/*
+!data/processed/.gitkeep
+!data/processed/README.md
+data/external/*
+!data/external/.gitkeep
+!data/external/README.md
+
+# --- Quarantine holds real rejected records; keep the directory, not contents ---
+quarantine/*
+!quarantine/.gitkeep
+!quarantine/README.md
+
+# --- Model artifacts are large and reproducible; the registry index is not ---
+models/artifacts/*
+!models/artifacts/.gitkeep
+!models/artifacts/README.md
+
+# --- Generated reports ---
+reports/*
+!reports/.gitkeep
+!reports/README.md
+
+# --- Notebook noise ---
+.ipynb_checkpoints/
+
+# --- OS ---
+.DS_Store
+Thumbs.db

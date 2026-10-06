@@ -1,0 +1,150 @@
+# Synthetic traffic dataset with known ground truth (SPEC section 37).
+#
+# Every effect declared here is echoed verbatim into ground_truth.json beside
+# the generated data, so later phases can be scored against what was actually
+# planted rather than merely demonstrated.
+#
+# Dates are absolute, not relative to "now", for two reasons: the committed
+# sample data must regenerate byte-identically, and a relative range would
+# eventually produce a future event_time, which the schema rightly rejects.
+
+seed: 20260101
+problem_type: traffic
+
+# The source stamps readings in its own local wall-clock time (IST). Ingestion
+# normalizes to UTC and keeps the original string in provenance, so the
+# event_time / source_time / received_time distinction is real and auditable.
+timezone_offset_hours: 5.5
+
+history_start: 2025-10-01
+history_end: 2026-06-30
+holdout_end: 2026-07-31 # replayed by the real-time simulator; never trained on
+interval_minutes: 60
+
+volume_metric: traffic_volume
+speed_metric: average_speed
+rainfall_metric: rainfall
+rainfall_unit: mm
+rainfall_location_id: CITY
+
+zones:
+  - location_id: ZONE-A
+    description: six-lane arterial corridor
+    latitude: 13.0827
+    longitude: 80.2707
+    base_volume: 6200
+    base_speed: 48
+    noise_fraction: 0.07
+    sensor_id: sensor-A12
+    clock_skew_seconds: 37 # each sensor's clock is slightly off, on purpose
+
+  - location_id: ZONE-B
+    description: CBD approach - carries the Friday-evening pattern
+    latitude: 13.0604
+    longitude: 80.2496
+    base_volume: 4800
+    base_speed: 42
+    noise_fraction: 0.08
+    sensor_id: sensor-B07
+    clock_skew_seconds: -52
+
+  - location_id: ZONE-C
+    description: residential collector - low volume, scattered feed gaps
+    latitude: 13.0351
+    longitude: 80.2100
+    base_volume: 1700
+    base_speed: 38
+    noise_fraction: 0.11
+    sensor_id: sensor-C03
+    clock_skew_seconds: 11
+
+  - location_id: ZONE-D
+    description: ring road - carries the frozen-sensor failure
+    latitude: 13.1100
+    longitude: 80.2250
+    base_volume: 3900
+    base_speed: 55
+    noise_fraction: 0.09
+    sensor_id: sensor-D21
+    clock_skew_seconds: 88
+
+# --- Patterns to be discovered (SPEC section 21) -----------------------------
+
+# The headline spatio-temporal pattern: Zone B + Friday + 18:00-20:00.
+# Deliberately confined to one zone, so a discovery phase has to localize it
+# rather than claiming a city-wide effect.
+friday_evening:
+  enabled: true
+  location_id: ZONE-B
+  weekday: 4 # Monday=0, so 4 is Friday
+  start_hour: 18
+  end_hour: 20 # exclusive
+  volume_multiplier: 2.2
+  speed_multiplier: 0.55
+
+# Rain is emitted as its own observation series from its own source. Nothing in
+# a traffic row says it rained, so the conditional relationship has to be found.
+rain_effect:
+  enabled: true
+  volume_coefficient: 0.03 # +3% volume per mm, up to the cap
+  speed_coefficient: 0.02 # -2% speed per mm, up to the cap
+  cap_mm: 20.0 # heavy rain saturates rather than scaling without limit
+
+# --- Anomalies (SPEC sections 17, 29) ----------------------------------------
+
+# A permanent baseline shift partway through: the city changed, this is not a
+# data error. ZONE-C and ZONE-D are left unshifted as controls.
+drift:
+  enabled: true
+  start_date: 2026-03-01
+  location_ids: [ZONE-A, ZONE-B]
+  volume_multiplier: 1.18
+  reason: new flyover opened, shifting baseline demand
+
+# A frozen sensor: it keeps reporting, but reports the same number for two and
+# a half days. Worse than missing data, because the value looks plausible.
+# Confined to ZONE-D so it cannot distort the Zone-B pattern measurement.
+sensor_failure:
+  enabled: true
+  location_id: ZONE-D
+  start: 2025-12-05 02:00:00
+  end: 2025-12-07 14:00:00
+
+# --- Missing data (SPEC section 15) ------------------------------------------
+#
+# Written as EMPTY value cells, never as 0. A sensor that reported nothing did
+# not report zero vehicles.
+missing_data:
+  enabled: true
+  windows:
+    - location_id: ZONE-A
+      start: 2025-11-14 08:00:00
+      end: 2025-11-14 14:00:00
+      reason: six-hour feed outage during maintenance
+    - location_id: ZONE-B
+      start: 2026-02-03 00:00:00
+      end: 2026-02-05 00:00:00
+      reason: two-day telemetry loss
+    - location_id: ZONE-D
+      start: 2026-05-21 18:00:00
+      end: 2026-05-22 06:00:00
+      reason: overnight power failure at the cabinet
+  scattered_fraction: 0.03 # ordinary background dropout rate
+  scattered_location_ids: [ZONE-C]
+
+# --- Planted integrity problems for Phase 2 to catch (SPEC sections 9, 10, 14)
+#
+# Emitted exactly as a misbehaving source would produce them. Phase 1 does not
+# detect or repair any of it; these rows are what Phase 2's detectors will be
+# scored against, by record id.
+integrity:
+  duplicate_count: 12 # same observation reported twice, new record id
+  conflict_count: 8 # a second source disagreeing on the same observation
+  conflict_divergence: 0.22
+  conflict_source_id: city-warehouse
+  negative_value_count: 4 # impossible, but representable: ingests as PENDING
+  impossible_speed_count: 2
+  impossible_speed_value: 480.0
+  unparseable_timestamp_count: 2 # not representable: ingestion must reject it
+  unknown_unit_count: 1
+  unknown_unit: vehicles/fortnight

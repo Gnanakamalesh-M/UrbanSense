@@ -1,0 +1,64 @@
+# UrbanSense — the API and the dashboard on localhost (SPEC section 39).
+#
+#   docker compose build     # ~10 min: installs dependencies, bakes artifacts
+#   docker compose up        # API on 127.0.0.1:8000, dashboard on 127.0.0.1:8501
+#
+# Then open http://127.0.0.1:8501 for the dashboard, or
+# http://127.0.0.1:8000/docs for the API schema.
+#
+# Both services run from one image. The expensive part of the build is
+# generating the demo artifacts, and building that twice would be waste, so the
+# image is built once and each service picks a different command.
+#
+# Every port is published to 127.0.0.1 explicitly. Neither service has any
+# authentication -- that is a deliberate scope decision for a demonstration
+# project, documented in docs/api.md -- so the compose file must not expose them
+# to the network. A plain "8000:8000" would bind every interface, which on most
+# machines means the LAN.
+---
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: urbansense:latest
+    container_name: urbansense-api
+    # The server listens on 0.0.0.0 *inside* the container, because a process
+    # bound to the container's own loopback would be unreachable even from the
+    # dashboard container. The localhost guarantee is the published mapping
+    # below, not the in-container bind.
+    command: ["python", "scripts/serve_api.py", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "127.0.0.1:8000:8000"
+    # No volumes. The artifacts are baked into the image, so the container has
+    # nothing to write and no host directory to depend on. Mounting the repo
+    # would also let a container write to data/raw, which is append-only.
+    read_only: false
+    restart: "no"
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: urbansense:latest
+    container_name: urbansense-dashboard
+    # Reads through the API rather than off disk. Both would work -- the
+    # artifacts are in this image too -- but going over HTTP means the compose
+    # demo actually exercises the API layer instead of running two services
+    # that ignore each other.
+    command: ["python", "scripts/serve_dashboard.py",
+              "--host", "0.0.0.0", "--port", "8501",
+              "--api-url", "http://api:8000"]
+    ports:
+      - "127.0.0.1:8501:8501"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: "no"

@@ -1,0 +1,121 @@
+# Traffic — the only problem domain implemented in v1 (SPEC section 3).
+#
+# `aliases` are the terminology mapping from SPEC section 5: whatever a source
+# calls a metric, it resolves to the canonical `name` here. Unlisted units are
+# unknown units and are quarantined rather than assumed (SPEC section 11).
+
+problem_type: traffic
+enabled: true
+description: >
+  Traffic volume, congestion probability and severity, expected congestion
+  period, and hotspot detection.
+
+metrics:
+  - name: traffic_volume
+    canonical_unit: vehicles/hour
+    accepted_units:
+      - vehicles/hour
+      - vehicles/15min
+      - vehicles/5min
+      - vehicles/minute
+      - vehicles/day
+    aliases:
+      - vehicle count
+      - vehicle_count
+      - number of vehicles
+      - vehicles observed
+      - traffic count
+      - flow
+    non_negative: true
+    plausible_min: 0
+    # Above this, flag an outlier for investigation — festival, diversion,
+    # accident or sensor failure are all possible. An outlier is not an error
+    # (SPEC section 16).
+    plausible_max: 25000
+    default_aggregation: hourly
+
+  - name: average_speed
+    canonical_unit: km/hour
+    accepted_units:
+      - km/hour
+      - m/s
+      - mph
+    aliases:
+      - mean speed
+      - avg speed
+      - average_vehicle_speed
+      - speed
+    non_negative: true
+    plausible_min: 0
+    plausible_max: 150
+    default_aggregation: hourly
+
+  - name: congestion_index
+    # Normalized 0–1 congestion measure; unitless but still declared, because a
+    # value without a unit cannot be compared.
+    canonical_unit: ratio
+    accepted_units:
+      - ratio
+      - percent
+    aliases:
+      - congestion level
+      - congestion_score
+      - level of service index
+    non_negative: true
+    plausible_min: 0
+    plausible_max: 1
+    default_aggregation: hourly
+
+  - name: occupancy
+    canonical_unit: ratio
+    accepted_units:
+      - ratio
+      - percent
+    aliases:
+      - lane occupancy
+      - detector occupancy
+    non_negative: true
+    plausible_min: 0
+    plausible_max: 1
+    default_aggregation: quarter_hour
+
+  - name: queue_length
+    canonical_unit: metre
+    accepted_units:
+      - metre
+      - kilometre
+      - foot
+    aliases:
+      - queue
+      - backup length
+      - standing queue
+    non_negative: true
+    plausible_min: 0
+    plausible_max: 5000
+    default_aggregation: instant
+
+# What counts as congestion, and how bad it is (SPEC section 25).
+#
+# A policy decision rather than a fact about the data: a six-lane arterial and a
+# residential collector do not become problems at the same vehicle count, which
+# is why the threshold is per zone and lives here rather than in code.
+#
+# The threshold is fitted on the TRAINING period only. That is enforced by the
+# fitting function's signature, not by this file -- `fit_thresholds` takes one
+# feature table and has no parameter through which validation or test data
+# could arrive.
+congestion:
+  metric: traffic_volume
+  threshold:
+    method: percentile
+    percentile: 90
+
+  # Bands on the ratio of predicted volume to the zone's threshold, so severity
+  # is monotonic in the prediction by construction. Validated at load as
+  # strictly ascending and starting at zero: overlapping bands would make the
+  # band assigned to a volume depend on iteration order.
+  severity_bands:
+    - {name: low, min_ratio: 0.0}
+    - {name: moderate, min_ratio: 1.0}
+    - {name: high, min_ratio: 1.3}
+    - {name: severe, min_ratio: 1.8}

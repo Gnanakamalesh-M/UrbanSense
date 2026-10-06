@@ -1,0 +1,1366 @@
+{
+  "algorithm": "sklearn.ensemble.HistGradientBoostingRegressor",
+  "algorithm_rationale": "handles NaN natively, so missing values stay missing instead of being imputed; deterministic under random_state; no platform binary",
+  "artifact_path": "models/artifacts/Traffic-v1.1.pkl",
+  "calibration": {
+    "isotonic_fitted_on": "validation",
+    "isotonic_fitting_base_rate": 0.2337,
+    "method": "normal residual tail, isotonic-recalibrated",
+    "note": "the isotonic map is fitted on validation only; test is scored, never fitted",
+    "reports": [
+      {
+        "base_rate": 0.2337,
+        "base_rate_shift_from_fitting_split": 0.0,
+        "beats_base_rate": true,
+        "calibrated_brier": 0.0667,
+        "calibration_improved": true,
+        "dataset": "validation",
+        "direction": "well matched",
+        "expected_calibration_error": 0.0003,
+        "in_sample_for_the_calibrator": true,
+        "raw_brier": 0.076,
+        "reference_brier_base_rate_only": 0.1791,
+        "reliability": [
+          {
+            "count": 2895,
+            "gap": -0.0005,
+            "mean_predicted": 0.0115,
+            "observed_frequency": 0.0111,
+            "range": "0.0-0.1"
+          },
+          {
+            "count": 28,
+            "gap": 0.0,
+            "mean_predicted": 0.1071,
+            "observed_frequency": 0.1071,
+            "range": "0.1-0.2"
+          },
+          {
+            "count": 266,
+            "gap": 0.0,
+            "mean_predicted": 0.2406,
+            "observed_frequency": 0.2406,
+            "range": "0.2-0.3"
+          },
+          {
+            "count": 107,
+            "gap": 0.0,
+            "mean_predicted": 0.3551,
+            "observed_frequency": 0.3551,
+            "range": "0.3-0.4"
+          },
+          {
+            "count": 134,
+            "gap": -0.0,
+            "mean_predicted": 0.4179,
+            "observed_frequency": 0.4179,
+            "range": "0.4-0.5"
+          },
+          {
+            "count": 122,
+            "gap": 0.0,
+            "mean_predicted": 0.5164,
+            "observed_frequency": 0.5164,
+            "range": "0.5-0.6"
+          },
+          {
+            "count": 408,
+            "gap": 0.0,
+            "mean_predicted": 0.674,
+            "observed_frequency": 0.674,
+            "range": "0.6-0.7"
+          },
+          {
+            "count": 102,
+            "gap": 0.0,
+            "mean_predicted": 0.7745,
+            "observed_frequency": 0.7745,
+            "range": "0.7-0.8"
+          },
+          {
+            "count": 151,
+            "gap": -0.0,
+            "mean_predicted": 0.8477,
+            "observed_frequency": 0.8477,
+            "range": "0.8-0.9"
+          },
+          {
+            "count": 332,
+            "gap": -0.0,
+            "mean_predicted": 0.9759,
+            "observed_frequency": 0.9759,
+            "range": "0.9-1.0"
+          }
+        ],
+        "rows": 4545
+      },
+      {
+        "base_rate": 0.2808,
+        "base_rate_shift_from_fitting_split": -0.0472,
+        "beats_base_rate": true,
+        "calibrated_brier": 0.0745,
+        "calibration_improved": true,
+        "dataset": "test",
+        "direction": "under-confident",
+        "expected_calibration_error": 0.0291,
+        "in_sample_for_the_calibrator": false,
+        "raw_brier": 0.0833,
+        "reference_brier_base_rate_only": 0.2042,
+        "reliability": [
+          {
+            "count": 2797,
+            "gap": 0.0134,
+            "mean_predicted": 0.0109,
+            "observed_frequency": 0.0243,
+            "range": "0.0-0.1"
+          },
+          {
+            "count": 34,
+            "gap": 0.0384,
+            "mean_predicted": 0.1087,
+            "observed_frequency": 0.1471,
+            "range": "0.1-0.2"
+          },
+          {
+            "count": 259,
+            "gap": 0.0653,
+            "mean_predicted": 0.2397,
+            "observed_frequency": 0.305,
+            "range": "0.2-0.3"
+          },
+          {
+            "count": 84,
+            "gap": 0.0862,
+            "mean_predicted": 0.3543,
+            "observed_frequency": 0.4405,
+            "range": "0.3-0.4"
+          },
+          {
+            "count": 137,
+            "gap": 0.1582,
+            "mean_predicted": 0.4184,
+            "observed_frequency": 0.5766,
+            "range": "0.4-0.5"
+          },
+          {
+            "count": 125,
+            "gap": 0.067,
+            "mean_predicted": 0.517,
+            "observed_frequency": 0.584,
+            "range": "0.5-0.6"
+          },
+          {
+            "count": 407,
+            "gap": 0.0632,
+            "mean_predicted": 0.6739,
+            "observed_frequency": 0.7371,
+            "range": "0.6-0.7"
+          },
+          {
+            "count": 134,
+            "gap": 0.0536,
+            "mean_predicted": 0.7747,
+            "observed_frequency": 0.8284,
+            "range": "0.7-0.8"
+          },
+          {
+            "count": 174,
+            "gap": 0.027,
+            "mean_predicted": 0.8465,
+            "observed_frequency": 0.8736,
+            "range": "0.8-0.9"
+          },
+          {
+            "count": 375,
+            "gap": -0.003,
+            "mean_predicted": 0.9817,
+            "observed_frequency": 0.9787,
+            "range": "0.9-1.0"
+          }
+        ],
+        "rows": 4526
+      }
+    ],
+    "residual_rows": 15492,
+    "residual_sigma": 158.3105,
+    "residuals_from": "train"
+  },
+  "code_version": "0.1.0",
+  "congestion": {
+    "by_zone": {
+      "ZONE-A": 5900.1,
+      "ZONE-B": 4651.6,
+      "ZONE-C": 1605.0,
+      "ZONE-D": 3691.0
+    },
+    "fitted_on": "train",
+    "method": "percentile",
+    "metric": "traffic_volume",
+    "note": "fitted on the training segment only; the congested rate rises in later periods because the definition is anchored to the past",
+    "percentile": 90.0,
+    "period": {
+      "first_sample": "2025-09-30T17:30:00+00:00",
+      "last_sample": "2026-03-13T11:30:00+00:00"
+    },
+    "rows": 15492,
+    "severity_bands": [
+      {
+        "min_ratio": 0.0,
+        "name": "low"
+      },
+      {
+        "min_ratio": 1.0,
+        "name": "moderate"
+      },
+      {
+        "min_ratio": 1.3,
+        "name": "high"
+      },
+      {
+        "min_ratio": 1.8,
+        "name": "severe"
+      }
+    ]
+  },
+  "created_at": "2026-10-03T06:05:42.218843+00:00",
+  "dataset_version": {
+    "generator_version": "1.0.0",
+    "seed": 20260101,
+    "source": "data/sample"
+  },
+  "error_analysis": {
+    "breakdowns": [
+      {
+        "dimension": "by rainfall",
+        "slices": [
+          {
+            "coverage": 1.0,
+            "mae": 272.3157,
+            "mean_actual": 2795.2647,
+            "name": "dry",
+            "relative_mae": 0.0974,
+            "rmse": 487.6903,
+            "rows": 3302
+          },
+          {
+            "coverage": 1.0,
+            "mae": 306.6213,
+            "mean_actual": 2955.6644,
+            "name": "light",
+            "relative_mae": 0.1037,
+            "rmse": 540.7407,
+            "rows": 1192
+          },
+          {
+            "coverage": 1.0,
+            "mae": 770.398,
+            "mean_actual": 4480.75,
+            "name": "heavy",
+            "relative_mae": 0.1719,
+            "rmse": 1094.829,
+            "rows": 32
+          }
+        ]
+      },
+      {
+        "dimension": "by time of day",
+        "slices": [
+          {
+            "coverage": 1.0,
+            "mae": 64.5273,
+            "mean_actual": 621.7827,
+            "name": "night",
+            "relative_mae": 0.1038,
+            "rmse": 98.2141,
+            "rows": 1109
+          },
+          {
+            "coverage": 1.0,
+            "mae": 364.5561,
+            "mean_actual": 3719.6295,
+            "name": "morning",
+            "relative_mae": 0.098,
+            "rmse": 552.3954,
+            "rows": 1139
+          },
+          {
+            "coverage": 1.0,
+            "mae": 369.9779,
+            "mean_actual": 3902.5489,
+            "name": "afternoon",
+            "relative_mae": 0.0948,
+            "rmse": 511.8509,
+            "rows": 951
+          },
+          {
+            "coverage": 1.0,
+            "mae": 339.6327,
+            "mean_actual": 3209.4657,
+            "name": "evening",
+            "relative_mae": 0.1058,
+            "rmse": 652.4232,
+            "rows": 1327
+          }
+        ]
+      },
+      {
+        "dimension": "by zone",
+        "slices": [
+          {
+            "coverage": 1.0,
+            "mae": 447.8693,
+            "mean_actual": 4421.8616,
+            "name": "ZONE-A",
+            "relative_mae": 0.1013,
+            "rmse": 659.1884,
+            "rows": 1142
+          },
+          {
+            "coverage": 1.0,
+            "mae": 366.8692,
+            "mean_actual": 3527.2019,
+            "name": "ZONE-B",
+            "relative_mae": 0.104,
+            "rmse": 690.4537,
+            "rows": 1144
+          },
+          {
+            "coverage": 1.0,
+            "mae": 109.7347,
+            "mean_actual": 1032.8575,
+            "name": "ZONE-C",
+            "relative_mae": 0.1062,
+            "rmse": 158.169,
+            "rows": 1109
+          },
+          {
+            "coverage": 1.0,
+            "mae": 209.0812,
+            "mean_actual": 2357.3616,
+            "name": "ZONE-D",
+            "relative_mae": 0.0887,
+            "rmse": 301.6316,
+            "rows": 1131
+          }
+        ]
+      },
+      {
+        "dimension": "by weekday",
+        "slices": [
+          {
+            "coverage": 1.0,
+            "mae": 282.025,
+            "mean_actual": 2936.3514,
+            "name": "Mon",
+            "relative_mae": 0.096,
+            "rmse": 463.6217,
+            "rows": 663
+          },
+          {
+            "coverage": 1.0,
+            "mae": 291.8584,
+            "mean_actual": 3032.5586,
+            "name": "Tue",
+            "relative_mae": 0.0962,
+            "rmse": 474.1448,
+            "rows": 666
+          },
+          {
+            "coverage": 1.0,
+            "mae": 306.6402,
+            "mean_actual": 3055.6272,
+            "name": "Wed",
+            "relative_mae": 0.1004,
+            "rmse": 516.6889,
+            "rows": 574
+          },
+          {
+            "coverage": 1.0,
+            "mae": 322.3387,
+            "mean_actual": 3257.4673,
+            "name": "Thu",
+            "relative_mae": 0.099,
+            "rmse": 525.9457,
+            "rows": 627
+          },
+          {
+            "coverage": 1.0,
+            "mae": 392.3292,
+            "mean_actual": 3402.2121,
+            "name": "Fri",
+            "relative_mae": 0.1153,
+            "rmse": 804.9649,
+            "rows": 660
+          },
+          {
+            "coverage": 1.0,
+            "mae": 223.1327,
+            "mean_actual": 2343.9354,
+            "name": "Sat",
+            "relative_mae": 0.0952,
+            "rmse": 336.4303,
+            "rows": 666
+          },
+          {
+            "coverage": 1.0,
+            "mae": 182.5519,
+            "mean_actual": 1980.794,
+            "name": "Sun",
+            "relative_mae": 0.0922,
+            "rmse": 273.9911,
+            "rows": 670
+          }
+        ]
+      },
+      {
+        "dimension": "Friday evening window",
+        "slices": [
+          {
+            "coverage": 1.0,
+            "mae": 1318.0139,
+            "mean_actual": 6931.0909,
+            "name": "Friday 18-20",
+            "relative_mae": 0.1902,
+            "rmse": 2276.9254,
+            "rows": 55
+          },
+          {
+            "coverage": 1.0,
+            "mae": 272.163,
+            "mean_actual": 2799.2149,
+            "name": "all other hours",
+            "relative_mae": 0.0972,
+            "rmse": 445.4373,
+            "rows": 4471
+          }
+        ]
+      },
+      {
+        "dimension": "by predicted severity",
+        "slices": [
+          {
+            "coverage": 1.0,
+            "mae": 791.4632,
+            "mean_actual": 6781.6132,
+            "name": "high",
+            "relative_mae": 0.1167,
+            "rmse": 1001.2379,
+            "rows": 212
+          },
+          {
+            "coverage": 1.0,
+            "mae": 190.9965,
+            "mean_actual": 2039.8838,
+            "name": "low",
+            "relative_mae": 0.0936,
+            "rmse": 306.6447,
+            "rows": 3392
+          },
+          {
+            "coverage": 1.0,
+            "mae": 449.902,
+            "mean_actual": 4782.7834,
+            "name": "moderate",
+            "relative_mae": 0.0941,
+            "rmse": 616.2189,
+            "rows": 905
+          },
+          {
+            "coverage": 1.0,
+            "mae": 3912.9496,
+            "mean_actual": 12417.2353,
+            "name": "severe",
+            "relative_mae": 0.3151,
+            "rmse": 4180.6404,
+            "rows": 17
+          }
+        ]
+      }
+    ],
+    "dataset": "test",
+    "model_version": "Traffic-v1.1",
+    "overall": {
+      "coverage": 1.0,
+      "mae": 284.8722,
+      "mean_actual": 2849.4255,
+      "name": "overall",
+      "relative_mae": 0.1,
+      "rmse": 508.9243,
+      "rows": 4526
+    },
+    "rows": 4526,
+    "weakest_slices": [
+      {
+        "coverage": 1.0,
+        "mae": 1318.0139,
+        "mean_actual": 6931.0909,
+        "name": "Friday 18-20",
+        "relative_mae": 0.1902,
+        "rmse": 2276.9254,
+        "rows": 55
+      },
+      {
+        "coverage": 1.0,
+        "mae": 770.398,
+        "mean_actual": 4480.75,
+        "name": "heavy",
+        "relative_mae": 0.1719,
+        "rmse": 1094.829,
+        "rows": 32
+      },
+      {
+        "coverage": 1.0,
+        "mae": 791.4632,
+        "mean_actual": 6781.6132,
+        "name": "high",
+        "relative_mae": 0.1167,
+        "rmse": 1001.2379,
+        "rows": 212
+      },
+      {
+        "coverage": 1.0,
+        "mae": 392.3292,
+        "mean_actual": 3402.2121,
+        "name": "Fri",
+        "relative_mae": 0.1153,
+        "rmse": 804.9649,
+        "rows": 660
+      },
+      {
+        "coverage": 1.0,
+        "mae": 109.7347,
+        "mean_actual": 1032.8575,
+        "name": "ZONE-C",
+        "relative_mae": 0.1062,
+        "rmse": 158.169,
+        "rows": 1109
+      }
+    ]
+  },
+  "excluded_rows": {
+    "conflicted_upstream": 16,
+    "dropped_missing_target": 253,
+    "duplicate_linked_upstream": 12,
+    "excluded_by_split_gaps": 1324,
+    "quarantined_upstream": 69,
+    "rows_considered": 26140
+  },
+  "explainability": {
+    "additive": true,
+    "chosen_because": "shap.TreeExplainer supports HistGradientBoostingRegressor and is exactly additive",
+    "factors": [
+      "historical traffic",
+      "rainfall",
+      "peak hour",
+      "weekday",
+      "season",
+      "location"
+    ],
+    "global_importance": {
+      "by_factor": {
+        "historical traffic": 0.8555,
+        "location": 0.0229,
+        "peak hour": 0.0813,
+        "rainfall": 0.0035,
+        "season": 0.0,
+        "weekday": 0.0368
+      },
+      "by_feature": {
+        "hour": 39.9307,
+        "hour_cos": 100.0417,
+        "hour_sin": 13.1295,
+        "is_weekend": 0.019,
+        "lag_168h": 50.742,
+        "lag_1h": 56.9937,
+        "lag_24h": 36.2225,
+        "month": 0.0,
+        "month_cos": 0.0,
+        "month_sin": 0.0,
+        "rainfall_0h": 6.588,
+        "rainfall_roll_24h": 0.0,
+        "roll_mean_168h": 40.5799,
+        "roll_mean_24h": 38.0606,
+        "roll_mean_3h": 77.8162,
+        "seasonal_lag_168h": 682.5357,
+        "seasonal_lag_24h": 627.6248,
+        "weekday": 69.1795,
+        "zone": 43.0912
+      },
+      "dataset": "validation",
+      "method": "permutation",
+      "note": "importance is association, not causation: a feature the model leans on may be standing in for something it never observed"
+    },
+    "method": "shap_tree"
+  },
+  "features": [
+    {
+      "description": "local hour of day, 0-23",
+      "kind": "calendar",
+      "location": null,
+      "metric": null,
+      "name": "hour",
+      "offset_hours": 0,
+      "window_hours": 0
+    },
+    {
+      "description": "sine of the hour cycle, so 23:00 and 00:00 are adjacent",
+      "kind": "calendar",
+      "location": null,
+      "metric": null,
+      "name": "hour_sin",
+      "offset_hours": 0,
+      "window_hours": 0
+    },
+    {
+      "description": "cosine of the hour cycle",
+      "kind": "calendar",
+      "location": null,
+      "metric": null,
+      "name": "hour_cos",
+      "offset_hours": 0,
+      "window_hours": 0
+    },
+    {
+      "description": "local day of week, Monday is 0",
+      "kind": "calendar",
+      "location": null,
+      "metric": null,
+      "name": "weekday",
+      "offset_hours": 0,
+      "window_hours": 0
+    },
+    {
+      "description": "1 on Saturday or Sunday",
+      "kind": "calendar",
+      "location": null,
+      "metric": null,
+      "name": "is_weekend",
+      "offset_hours": 0,
+      "window_hours": 0
+    },
+    {
+      "description": "local month, 1-12",
+      "kind": "calendar",
+      "location": null,
+      "metric": null,
+      "name": "month",
+      "offset_hours": 0,
+      "window_hours": 0
+    },
+    {
+      "description": "sine of the month cycle, for seasonality",
+      "kind": "calendar",
+      "location": null,
+      "metric": null,
+      "name": "month_sin",
+      "offset_hours": 0,
+      "window_hours": 0
+    },
+    {
+      "description": "cosine of the month cycle",
+      "kind": "calendar",
+      "location": null,
+      "metric": null,
+      "name": "month_cos",
+      "offset_hours": 0,
+      "window_hours": 0
+    },
+    {
+      "description": "target value 1h before the sample time",
+      "kind": "lag",
+      "location": null,
+      "metric": "traffic_volume",
+      "name": "lag_1h",
+      "offset_hours": 1,
+      "window_hours": 0
+    },
+    {
+      "description": "target value 24h before the sample time",
+      "kind": "lag",
+      "location": null,
+      "metric": "traffic_volume",
+      "name": "lag_24h",
+      "offset_hours": 24,
+      "window_hours": 0
+    },
+    {
+      "description": "target value 168h before the sample time",
+      "kind": "lag",
+      "location": null,
+      "metric": "traffic_volume",
+      "name": "lag_168h",
+      "offset_hours": 168,
+      "window_hours": 0
+    },
+    {
+      "description": "target value 24h before the target time (23h before the sample time)",
+      "kind": "lag",
+      "location": null,
+      "metric": "traffic_volume",
+      "name": "seasonal_lag_24h",
+      "offset_hours": 23,
+      "window_hours": 0
+    },
+    {
+      "description": "target value 168h before the target time (167h before the sample time)",
+      "kind": "lag",
+      "location": null,
+      "metric": "traffic_volume",
+      "name": "seasonal_lag_168h",
+      "offset_hours": 167,
+      "window_hours": 0
+    },
+    {
+      "description": "mean target over the 3h ending at the sample time",
+      "kind": "rolling",
+      "location": null,
+      "metric": "traffic_volume",
+      "name": "roll_mean_3h",
+      "offset_hours": 0,
+      "window_hours": 3
+    },
+    {
+      "description": "mean target over the 24h ending at the sample time",
+      "kind": "rolling",
+      "location": null,
+      "metric": "traffic_volume",
+      "name": "roll_mean_24h",
+      "offset_hours": 0,
+      "window_hours": 24
+    },
+    {
+      "description": "mean target over the 168h ending at the sample time",
+      "kind": "rolling",
+      "location": null,
+      "metric": "traffic_volume",
+      "name": "roll_mean_168h",
+      "offset_hours": 0,
+      "window_hours": 168
+    },
+    {
+      "description": "rainfall at CITY, 0h before the sample time",
+      "kind": "covariate",
+      "location": "CITY",
+      "metric": "rainfall",
+      "name": "rainfall_0h",
+      "offset_hours": 0,
+      "window_hours": 0
+    },
+    {
+      "description": "rainfall at CITY, mean over 24h ending the sample time",
+      "kind": "covariate",
+      "location": "CITY",
+      "metric": "rainfall",
+      "name": "rainfall_roll_24h",
+      "offset_hours": 0,
+      "window_hours": 24
+    },
+    {
+      "description": "categorical code for the location",
+      "kind": "spatial",
+      "location": null,
+      "metric": null,
+      "name": "zone",
+      "offset_hours": 0,
+      "window_hours": 0
+    }
+  ],
+  "gap_hours": 168,
+  "horizon_hours": 1,
+  "hyperparameters": {
+    "early_stopping": false,
+    "l2_regularization": 1.0,
+    "learning_rate": 0.06,
+    "loss": "squared_error",
+    "max_depth": 8,
+    "max_iter": 400,
+    "max_leaf_nodes": 63,
+    "min_samples_leaf": 20,
+    "random_state": 20260101
+  },
+  "interval": {
+    "limitation": "constant width within a zone; traffic error scales with volume, so the band is too wide overnight and too narrow at peak. A calibrated interval needs quantile regression.",
+    "lower_quantile": 0.1,
+    "method": "validation residual quantiles, per zone",
+    "per_zone_lower": {
+      "ZONE-A": -573.6,
+      "ZONE-B": -743.37,
+      "ZONE-C": -165.22,
+      "ZONE-D": -345.72
+    },
+    "per_zone_upper": {
+      "ZONE-A": 647.95,
+      "ZONE-B": 261.39,
+      "ZONE-C": 175.66,
+      "ZONE-D": 330.3
+    },
+    "upper_quantile": 0.9
+  },
+  "leakage_checks": {
+    "clean": true,
+    "distinct_received_times": 1,
+    "event_time_clause": "enforced",
+    "findings": [],
+    "leaky_features": [],
+    "probed_features": 19,
+    "probed_samples": 24,
+    "received_time_clause": "not_applicable",
+    "received_time_note": "1 distinct receipt instant: a batch load, so receipt order carries no information about when data was available and the clause cannot be probed"
+  },
+  "metrics": [
+    {
+      "dataset": "test",
+      "model": "naive_last",
+      "overall": {
+        "coverage": 0.9914,
+        "mae": 972.3648,
+        "mean_actual": 2849.4255,
+        "name": "overall",
+        "relative_mae": 0.3412,
+        "rmse": 1454.5422,
+        "rows": 4526
+      },
+      "slices": [
+        {
+          "coverage": 0.9982,
+          "mae": 1426.0377,
+          "mean_actual": 4421.8616,
+          "name": "zone ZONE-A",
+          "relative_mae": 0.3225,
+          "rmse": 1830.9319,
+          "rows": 1142
+        },
+        {
+          "coverage": 1.0,
+          "mae": 1299.3199,
+          "mean_actual": 3527.2019,
+          "name": "zone ZONE-B",
+          "relative_mae": 0.3684,
+          "rmse": 1955.9402,
+          "rows": 1144
+        },
+        {
+          "coverage": 0.9693,
+          "mae": 362.9802,
+          "mean_actual": 1032.8575,
+          "name": "zone ZONE-C",
+          "relative_mae": 0.3514,
+          "rmse": 475.9113,
+          "rows": 1109
+        },
+        {
+          "coverage": 0.9973,
+          "mae": 781.0973,
+          "mean_actual": 2357.3616,
+          "name": "zone ZONE-D",
+          "relative_mae": 0.3313,
+          "rmse": 994.9052,
+          "rows": 1131
+        },
+        {
+          "coverage": 1.0,
+          "mae": 792.5714,
+          "mean_actual": 7804.9286,
+          "name": "ZONE-A Fri 18-20",
+          "relative_mae": 0.1015,
+          "rmse": 971.3503,
+          "rows": 14
+        },
+        {
+          "coverage": 1.0,
+          "mae": 7247.8571,
+          "mean_actual": 13683.7857,
+          "name": "ZONE-B Fri 18-20",
+          "relative_mae": 0.5297,
+          "rmse": 7440.5526,
+          "rows": 14
+        },
+        {
+          "coverage": 0.9231,
+          "mae": 493.0769,
+          "mean_actual": 1719.0769,
+          "name": "ZONE-C Fri 18-20",
+          "relative_mae": 0.2868,
+          "rmse": 701.102,
+          "rows": 13
+        },
+        {
+          "coverage": 1.0,
+          "mae": 529.5,
+          "mean_actual": 4144.2857,
+          "name": "ZONE-D Fri 18-20",
+          "relative_mae": 0.1278,
+          "rmse": 679.8297,
+          "rows": 14
+        }
+      ]
+    },
+    {
+      "dataset": "test",
+      "model": "same_hour_last_week",
+      "overall": {
+        "coverage": 0.9901,
+        "mae": 589.897,
+        "mean_actual": 2849.4255,
+        "name": "overall",
+        "relative_mae": 0.207,
+        "rmse": 923.8535,
+        "rows": 4526
+      },
+      "slices": [
+        {
+          "coverage": 0.9982,
+          "mae": 852.2049,
+          "mean_actual": 4421.8616,
+          "name": "zone ZONE-A",
+          "relative_mae": 0.1927,
+          "rmse": 1117.3193,
+          "rows": 1142
+        },
+        {
+          "coverage": 1.0,
+          "mae": 764.7395,
+          "mean_actual": 3527.2019,
+          "name": "zone ZONE-B",
+          "relative_mae": 0.2168,
+          "rmse": 1262.681,
+          "rows": 1144
+        },
+        {
+          "coverage": 0.9729,
+          "mae": 247.2353,
+          "mean_actual": 1032.8575,
+          "name": "zone ZONE-C",
+          "relative_mae": 0.2394,
+          "rmse": 350.7686,
+          "rows": 1109
+        },
+        {
+          "coverage": 0.9885,
+          "mae": 484.1821,
+          "mean_actual": 2357.3616,
+          "name": "zone ZONE-D",
+          "relative_mae": 0.2054,
+          "rmse": 649.3471,
+          "rows": 1131
+        },
+        {
+          "coverage": 1.0,
+          "mae": 856.4286,
+          "mean_actual": 7804.9286,
+          "name": "ZONE-A Fri 18-20",
+          "relative_mae": 0.1097,
+          "rmse": 985.5808,
+          "rows": 14
+        },
+        {
+          "coverage": 1.0,
+          "mae": 4896.8571,
+          "mean_actual": 13683.7857,
+          "name": "ZONE-B Fri 18-20",
+          "relative_mae": 0.3579,
+          "rmse": 5704.7235,
+          "rows": 14
+        },
+        {
+          "coverage": 0.9231,
+          "mae": 339.7692,
+          "mean_actual": 1719.0769,
+          "name": "ZONE-C Fri 18-20",
+          "relative_mae": 0.1976,
+          "rmse": 571.4943,
+          "rows": 13
+        },
+        {
+          "coverage": 1.0,
+          "mae": 651.4286,
+          "mean_actual": 4144.2857,
+          "name": "ZONE-D Fri 18-20",
+          "relative_mae": 0.1572,
+          "rmse": 810.4507,
+          "rows": 14
+        }
+      ]
+    },
+    {
+      "dataset": "test",
+      "model": "gradient_boosting",
+      "overall": {
+        "coverage": 1.0,
+        "mae": 284.8722,
+        "mean_actual": 2849.4255,
+        "name": "overall",
+        "relative_mae": 0.1,
+        "rmse": 508.9243,
+        "rows": 4526
+      },
+      "slices": [
+        {
+          "coverage": 1.0,
+          "mae": 447.8693,
+          "mean_actual": 4421.8616,
+          "name": "zone ZONE-A",
+          "relative_mae": 0.1013,
+          "rmse": 659.1884,
+          "rows": 1142
+        },
+        {
+          "coverage": 1.0,
+          "mae": 366.8692,
+          "mean_actual": 3527.2019,
+          "name": "zone ZONE-B",
+          "relative_mae": 0.104,
+          "rmse": 690.4537,
+          "rows": 1144
+        },
+        {
+          "coverage": 1.0,
+          "mae": 109.7347,
+          "mean_actual": 1032.8575,
+          "name": "zone ZONE-C",
+          "relative_mae": 0.1062,
+          "rmse": 158.169,
+          "rows": 1109
+        },
+        {
+          "coverage": 1.0,
+          "mae": 209.0812,
+          "mean_actual": 2357.3616,
+          "name": "zone ZONE-D",
+          "relative_mae": 0.0887,
+          "rmse": 301.6316,
+          "rows": 1131
+        },
+        {
+          "coverage": 1.0,
+          "mae": 498.2228,
+          "mean_actual": 7804.9286,
+          "name": "ZONE-A Fri 18-20",
+          "relative_mae": 0.0638,
+          "rmse": 640.6005,
+          "rows": 14
+        },
+        {
+          "coverage": 1.0,
+          "mae": 4193.8369,
+          "mean_actual": 13683.7857,
+          "name": "ZONE-B Fri 18-20",
+          "relative_mae": 0.3065,
+          "rmse": 4438.816,
+          "rows": 14
+        },
+        {
+          "coverage": 1.0,
+          "mae": 169.256,
+          "mean_actual": 1719.0769,
+          "name": "ZONE-C Fri 18-20",
+          "relative_mae": 0.0985,
+          "rmse": 231.83,
+          "rows": 13
+        },
+        {
+          "coverage": 1.0,
+          "mae": 328.6858,
+          "mean_actual": 4144.2857,
+          "name": "ZONE-D Fri 18-20",
+          "relative_mae": 0.0793,
+          "rmse": 451.532,
+          "rows": 14
+        }
+      ]
+    },
+    {
+      "dataset": "holdout",
+      "model": "naive_last",
+      "overall": {
+        "coverage": 0.9902,
+        "mae": 964.1394,
+        "mean_actual": 2857.464,
+        "name": "overall",
+        "relative_mae": 0.3374,
+        "rmse": 1424.7245,
+        "rows": 2955
+      },
+      "slices": [
+        {
+          "coverage": 0.9973,
+          "mae": 1406.5672,
+          "mean_actual": 4445.1452,
+          "name": "zone ZONE-A",
+          "relative_mae": 0.3164,
+          "rmse": 1793.0561,
+          "rows": 744
+        },
+        {
+          "coverage": 0.9973,
+          "mae": 1292.0228,
+          "mean_actual": 3532.5793,
+          "name": "zone ZONE-B",
+          "relative_mae": 0.3657,
+          "rmse": 1913.5673,
+          "rows": 744
+        },
+        {
+          "coverage": 0.9682,
+          "mae": 373.8963,
+          "mean_actual": 1035.787,
+          "name": "zone ZONE-C",
+          "relative_mae": 0.361,
+          "rmse": 483.752,
+          "rows": 723
+        },
+        {
+          "coverage": 0.9973,
+          "mae": 767.4113,
+          "mean_actual": 2364.9261,
+          "name": "zone ZONE-D",
+          "relative_mae": 0.3245,
+          "rmse": 978.706,
+          "rows": 744
+        },
+        {
+          "coverage": 1.0,
+          "mae": 1150.0,
+          "mean_actual": 7959.7,
+          "name": "ZONE-A Fri 18-20",
+          "relative_mae": 0.1445,
+          "rmse": 1258.4645,
+          "rows": 10
+        },
+        {
+          "coverage": 1.0,
+          "mae": 6539.8,
+          "mean_actual": 12740.4,
+          "name": "ZONE-B Fri 18-20",
+          "relative_mae": 0.5133,
+          "rmse": 6707.4018,
+          "rows": 10
+        },
+        {
+          "coverage": 1.0,
+          "mae": 224.3333,
+          "mean_actual": 1853.2222,
+          "name": "ZONE-C Fri 18-20",
+          "relative_mae": 0.1211,
+          "rmse": 265.7373,
+          "rows": 9
+        },
+        {
+          "coverage": 1.0,
+          "mae": 691.7,
+          "mean_actual": 3897.9,
+          "name": "ZONE-D Fri 18-20",
+          "relative_mae": 0.1775,
+          "rmse": 789.3751,
+          "rows": 10
+        }
+      ]
+    },
+    {
+      "dataset": "holdout",
+      "model": "same_hour_last_week",
+      "overall": {
+        "coverage": 0.7668,
+        "mae": 1081.9547,
+        "mean_actual": 2857.464,
+        "name": "overall",
+        "relative_mae": 0.3786,
+        "rmse": 1872.9684,
+        "rows": 2955
+      },
+      "slices": [
+        {
+          "coverage": 0.7728,
+          "mae": 1628.879,
+          "mean_actual": 4445.1452,
+          "name": "zone ZONE-A",
+          "relative_mae": 0.3664,
+          "rmse": 2579.1355,
+          "rows": 744
+        },
+        {
+          "coverage": 0.7728,
+          "mae": 1380.9758,
+          "mean_actual": 3532.5793,
+          "name": "zone ZONE-B",
+          "relative_mae": 0.3909,
+          "rmse": 2234.2186,
+          "rows": 744
+        },
+        {
+          "coverage": 0.7483,
+          "mae": 421.9557,
+          "mean_actual": 1035.787,
+          "name": "zone ZONE-C",
+          "relative_mae": 0.4074,
+          "rmse": 643.0095,
+          "rows": 723
+        },
+        {
+          "coverage": 0.7728,
+          "mae": 877.379,
+          "mean_actual": 2364.9261,
+          "name": "zone ZONE-D",
+          "relative_mae": 0.371,
+          "rmse": 1373.8857,
+          "rows": 744
+        },
+        {
+          "coverage": 0.8,
+          "mae": 2395.8,
+          "mean_actual": 7959.7,
+          "name": "ZONE-A Fri 18-20",
+          "relative_mae": 0.301,
+          "rmse": 3661.695,
+          "rows": 10
+        },
+        {
+          "coverage": 0.8,
+          "mae": 6183.2,
+          "mean_actual": 12740.4,
+          "name": "ZONE-B Fri 18-20",
+          "relative_mae": 0.4853,
+          "rmse": 7517.8324,
+          "rows": 10
+        },
+        {
+          "coverage": 0.7778,
+          "mae": 799.6667,
+          "mean_actual": 1853.2222,
+          "name": "ZONE-C Fri 18-20",
+          "relative_mae": 0.4315,
+          "rmse": 1067.7306,
+          "rows": 9
+        },
+        {
+          "coverage": 0.8,
+          "mae": 1068.7,
+          "mean_actual": 3897.9,
+          "name": "ZONE-D Fri 18-20",
+          "relative_mae": 0.2742,
+          "rmse": 1734.7261,
+          "rows": 10
+        }
+      ]
+    },
+    {
+      "dataset": "holdout",
+      "model": "gradient_boosting",
+      "overall": {
+        "coverage": 1.0,
+        "mae": 295.2099,
+        "mean_actual": 2857.464,
+        "name": "overall",
+        "relative_mae": 0.1033,
+        "rmse": 531.2561,
+        "rows": 2955
+      },
+      "slices": [
+        {
+          "coverage": 1.0,
+          "mae": 513.8536,
+          "mean_actual": 4445.1452,
+          "name": "zone ZONE-A",
+          "relative_mae": 0.1156,
+          "rmse": 740.0996,
+          "rows": 744
+        },
+        {
+          "coverage": 1.0,
+          "mae": 341.0919,
+          "mean_actual": 3532.5793,
+          "name": "zone ZONE-B",
+          "relative_mae": 0.0966,
+          "rmse": 679.8711,
+          "rows": 744
+        },
+        {
+          "coverage": 1.0,
+          "mae": 116.0364,
+          "mean_actual": 1035.787,
+          "name": "zone ZONE-C",
+          "relative_mae": 0.112,
+          "rmse": 165.514,
+          "rows": 723
+        },
+        {
+          "coverage": 1.0,
+          "mae": 204.8003,
+          "mean_actual": 2364.9261,
+          "name": "zone ZONE-D",
+          "relative_mae": 0.0866,
+          "rmse": 290.469,
+          "rows": 744
+        },
+        {
+          "coverage": 1.0,
+          "mae": 973.9206,
+          "mean_actual": 7959.7,
+          "name": "ZONE-A Fri 18-20",
+          "relative_mae": 0.1224,
+          "rmse": 1203.1041,
+          "rows": 10
+        },
+        {
+          "coverage": 1.0,
+          "mae": 4339.7981,
+          "mean_actual": 12740.4,
+          "name": "ZONE-B Fri 18-20",
+          "relative_mae": 0.3406,
+          "rmse": 4628.6779,
+          "rows": 10
+        },
+        {
+          "coverage": 1.0,
+          "mae": 256.7527,
+          "mean_actual": 1853.2222,
+          "name": "ZONE-C Fri 18-20",
+          "relative_mae": 0.1385,
+          "rmse": 279.8172,
+          "rows": 9
+        },
+        {
+          "coverage": 1.0,
+          "mae": 489.4939,
+          "mean_actual": 3897.9,
+          "name": "ZONE-D Fri 18-20",
+          "relative_mae": 0.1256,
+          "rmse": 573.6162,
+          "rows": 10
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Trained on synthetic data with known ground truth; these figures do not predict accuracy on a real city's feed.",
+    "Training straddles the planted drift at 2026-03-01 while validation and test are entirely post-drift. Lag features carry the new level, so the model adapts through its inputs; drift detection is Phase 6.",
+    "The uncertainty band is constant within a zone, so it is too wide overnight and too narrow at peak. A calibrated interval needs quantile regression.",
+    "Hyperparameters were chosen on the validation segment only. The test segment was evaluated once.",
+    "Congestion thresholds are fitted on the training segment only, so the congested rate rises from 0.100 on train to 0.281 on test as the city gets busier. The definition ages on purpose: re-fitting per segment would let the test split set its own pass mark.",
+    "Congestion probabilities are calibrated on validation and are under-confident on test for the same reason -- fitted where congestion occurs 23.4% of the time, applied where it occurs 28.1%. The reliability tables above record the gap per bin.",
+    "Factor contributions are associations the model learned, not causes. Historical traffic carries roughly 85% of the attribution because the seasonal lags encode the Friday pattern directly.",
+    "The model's weakest slice is the Friday 18:00-20:00 window at 19.0% relative error against 10.0% overall, and predictions it labels severe are off by 31.5%. Both are reported rather than averaged away."
+  ],
+  "problem_type": "traffic",
+  "status": "champion",
+  "target": "traffic_volume",
+  "test_period": {
+    "end": "2026-06-30T16:30:00+00:00",
+    "name": "test",
+    "rows": 4526,
+    "start": "2026-05-14T01:30:00+00:00"
+  },
+  "training_period": {
+    "end": "2026-03-13T11:30:00+00:00",
+    "name": "train",
+    "rows": 15492,
+    "start": "2025-09-30T17:30:00+00:00"
+  },
+  "validation_period": {
+    "end": "2026-05-07T01:30:00+00:00",
+    "name": "validation",
+    "rows": 4545,
+    "start": "2026-03-20T11:30:00+00:00"
+  },
+  "version": "Traffic-v1.1"
+}

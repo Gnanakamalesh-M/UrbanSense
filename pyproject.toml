@@ -1,0 +1,171 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "urbansense"
+version = "0.1.0"
+description = "Adaptive urban problem intelligence and prediction platform"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+  "pydantic>=2.7",
+  "pyyaml>=6.0",
+  "python-dotenv>=1.0",
+  # Phase 4. HistGradientBoostingRegressor handles NaN natively, which is what
+  # lets missing values stay missing instead of being imputed.
+  "scikit-learn>=1.5",
+  "numpy>=1.26",
+  # Phase 5. Present transitively via scikit-learn, but pattern discovery imports
+  # scipy.stats directly for Mann-Whitney U and Spearman, so it is declared.
+  "scipy>=1.11",
+  # Phase 8: the read-only API layer (SPEC section 44). Floors chosen so CI on
+  # 3.11 and this machine on 3.14 both resolve: fastapi and starlette require
+  # >= 3.10 from 0.115 onward.
+  "fastapi>=0.115",
+  "uvicorn>=0.30",
+]
+
+[project.optional-dependencies]
+# SHAP is optional on purpose. shap 0.52 ships a cp312-abi3 wheel, so this
+# machine (3.14) and CI (3.11) cannot be guaranteed the same version, and a
+# pinned one would break one of the two. The explainer falls back to
+# NaN-occlusion when shap is absent and records which method ran, so both
+# environments produce explanations and CI exercises the fallback path.
+explain = ["shap>=0.46"]
+
+# Phase 9: the demonstration dashboard (SPEC section 43). Optional so an
+# API-only or CI install stays light -- streamlit pulls pandas, pyarrow,
+# altair, pydeck and protobuf, which nothing else in the project needs. The
+# charts and the zone map come from that bundle, so no chart library is
+# declared separately. Resolves on 3.11 and on 3.14 (streamlit 1.65.0).
+dashboard = ["streamlit>=1.40"]
+
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=5.0",
+  "ruff>=0.6",
+  "mypy>=1.11",
+  "types-PyYAML>=6.0",
+  # Phase 8: starlette's TestClient transport. A test-only dependency -- the
+  # API itself never imports it.
+  "httpx>=0.27",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/urbansense"]
+
+# ---------------------------------------------------------------------------
+# Lint / format
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "F",   # pyflakes
+  "I",   # import sorting
+  "UP",  # pyupgrade
+  "B",   # bugbear
+  "ANN", # annotations — type hints are a project rule
+  "D",   # docstrings
+  "RUF",
+]
+ignore = [
+  "D105", # magic method docstrings
+  "D107", # __init__ docstring; documented at class level instead
+  "D203", # conflicts with D211
+  "D213", # conflicts with D212
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+# Tests document themselves through their names and assertions; validator-
+# rejection tests intentionally construct invalid objects.
+"tests/*" = ["D100", "D103", "ANN001", "ANN201", "ANN401"]
+# Package stubs are docstring-only by design.
+"src/urbansense/*/__init__.py" = ["D104"]
+# Scripts insert src/ on sys.path before importing the package, so their imports
+# cannot sit at the top of the file.
+"scripts/*.py" = ["E402"]
+
+# ---------------------------------------------------------------------------
+# Types
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.11"
+files = ["src/urbansense", "scripts"]
+strict = true
+plugins = ["pydantic.mypy"]
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+# Stub packages carry no code yet.
+module = "urbansense.*"
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+# These ship no type stubs and no py.typed marker. Narrowed to the modules we
+# actually import so nothing else loses checking. streamlit and pandas arrive
+# with the Phase 9 dashboard extra and are used only in dashboard/app.py.
+module = ["sklearn.*", "scipy.*", "shap.*", "streamlit.*", "pandas.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# The dashboard page module must type-check both with and without streamlit
+# installed, because CI deliberately does not install it (streamlit pulls
+# pyarrow and pandas, which would dominate install time and which nothing else
+# in the project imports).
+#
+# That makes `@st.cache_resource` two different things to mypy. Installed,
+# streamlit ships a py.typed marker, so the decorator is properly typed and
+# strict mode is happy. Absent, the override above resolves `st` to `Any`, and
+# a decorator of type `Any` trips `disallow_untyped_decorators` -- which strict
+# mode enables -- as `untyped-decorator`.
+#
+# A `# type: ignore[untyped-decorator]` cannot fix this: strict also enables
+# `warn_unused_ignores`, so the comment needed in CI is itself an error
+# locally, where streamlit *is* installed. Verified, not assumed -- adding it
+# produced `Unused "type: ignore" comment [unused-ignore]` on this machine.
+# Silencing that too would mean disabling two checks instead of one.
+#
+# So this relaxes exactly one setting for exactly one module. Everything else
+# about app.py stays strictly checked, including the annotations on every
+# function it defines (`disallow_untyped_defs` above still applies).
+module = ["urbansense.dashboard.app"]
+disallow_untyped_decorators = false
+
+# ---------------------------------------------------------------------------
+# Tests
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers --strict-config"
+filterwarnings = [
+  # A warning in our own code is a bug, so warnings fail the suite.
+  "error",
+  # Except these: shap imports matplotlib at module load, and matplotlib warns
+  # about its own set_bad / set_over / set_under deprecations. Third-party and
+  # not fixable here, so the ignore is scoped to that one message shape -- a
+  # deprecation anywhere else, our own code included, still fails the suite.
+  "default:The set_[a-z]+ function will be deprecated:PendingDeprecationWarning",
+  # And this one: starlette.testclient warns at import that using httpx as its
+  # transport is deprecated in favour of httpx2. httpx2 is not on PyPI, so the
+  # library's own suggested fix is unavailable; scoped to that one message so a
+  # deprecation anywhere else still fails the suite.
+  "default:Using `httpx` with `starlette.testclient` is deprecated:Warning",
+]
+
+[tool.coverage.run]
+source = ["src/urbansense"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]

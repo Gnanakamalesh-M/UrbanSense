@@ -1,0 +1,77 @@
+# Canonical location registry (SPEC section 13).
+#
+# Every observation resolves to one of these `location_id`s. Resolution is
+# EXACT-ONLY: an id, name or alias below matches; anything else goes to review
+# with reason LOCATION_REVIEW_REQUIRED.
+#
+# `aliases` are curated human assertions that a spelling means this zone, which
+# is why they are trusted completely. String similarity is NOT trusted: the spec
+# says similar names must not be assumed identical, and "Anna Nagar East" below
+# is deliberately absent from ZONE-B's aliases because it is a different road.
+# Auto-matching the two would merge their traffic permanently and invisibly.
+#
+# To add a new spelling a feed uses, add it here. That is the only safe way --
+# and it leaves a reviewable record of who decided the two names are the same.
+
+zones:
+  - location_id: ZONE-A
+    name: Mount Road Corridor
+    description: six-lane arterial corridor
+    latitude: 13.0827
+    longitude: 80.2707
+    aliases:
+      - zone-a
+      - Z-A
+      - mount road
+      - Anna Salai
+      - zone 1
+
+  - location_id: ZONE-B
+    name: Anna Nagar
+    description: CBD approach; carries the Friday-evening congestion pattern
+    latitude: 13.0604
+    longitude: 80.2496
+    aliases:
+      - zone-b
+      - Z-B
+      - anna nagar
+      - AnnaNagar
+      - zone-17
+    # NOTE: "Anna Nagar East" and "Anna Nagar West" are deliberately NOT
+    # aliases. They are adjacent but distinct areas. A feed reporting them
+    # must go to review so a human decides whether they are new zones or
+    # alternative names for this one.
+
+  - location_id: ZONE-C
+    name: Adyar Residential
+    description: residential collector; low volume, scattered feed gaps
+    latitude: 13.0351
+    longitude: 80.2100
+    aliases:
+      - zone-c
+      - Z-C
+      - adyar
+      - zone 3
+
+  - location_id: ZONE-D
+    name: Outer Ring Road
+    description: ring road; carries the frozen-sensor failure
+    latitude: 13.1100
+    longitude: 80.2250
+    aliases:
+      - zone-d
+      - Z-D
+      - ORR
+      - outer ring
+      - zone 4
+
+  - location_id: CITY
+    name: City Aggregate
+    description: city-wide reference point, used by the rain gauge
+    latitude: 13.0827
+    longitude: 80.2707
+    aliases:
+      - citywide
+      - city wide
+      - all zones
+      - chennai

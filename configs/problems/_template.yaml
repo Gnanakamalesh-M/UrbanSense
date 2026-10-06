@@ -1,0 +1,53 @@
+# Template for adding a problem domain (SPEC section 3).
+#
+# Files beginning with "_" are never loaded as active problems — this one exists
+# to document the shape. To add flood or waste:
+#
+#   1. Copy this file to configs/problems/<name>.yaml where <name> is a member
+#      of urbansense.schemas.enums.ProblemType ("flood" or "waste" today).
+#      The filename must match the problem_type field; a mismatch is an error
+#      rather than a guess.
+#   2. Fill in the metrics below.
+#   3. Add <name> to the `problems:` list in configs/base.yaml.
+#
+# No Python changes are required. Nothing in the codebase special-cases traffic.
+
+problem_type: flood # must equal this file's name, minus .yaml
+enabled: false # v1 ships traffic only; flip to true when the domain is ready
+description: >
+  One-line description of what this domain covers.
+
+metrics:
+  - # Canonical metric name. Goes into Observation.metric verbatim.
+    name: rainfall
+
+    # Every value of this metric is normalized to this unit. Original value and
+    # unit are always retained on the observation as well (SPEC section 11).
+    canonical_unit: mm
+
+    # Units a source may legitimately supply. Must include canonical_unit.
+    # Anything not listed is an unknown unit and is quarantined, never coerced.
+    accepted_units:
+      - mm
+      - cm
+      - inch
+
+    # Source-side terminology that means this metric (SPEC section 5). Matching
+    # is case-insensitive and treats spaces, hyphens and underscores alike.
+    aliases:
+      - precipitation
+      - rain depth
+      - rainfall_mm
+
+    # Negative values are physically impossible for this metric. Such records go
+    # to quarantine — they are never clipped to zero or dropped (SPEC section 14).
+    non_negative: true
+
+    # Plausible range. Values outside it are flagged as outliers for
+    # investigation, which is not the same as being marked wrong (SPEC section 16).
+    plausible_min: 0
+    plausible_max: 500
+
+    # Temporal granularity assumed when a source does not say. One of:
+    # instant, minute, quarter_hour, hourly, daily, weekly, monthly.
+    default_aggregation: hourly

@@ -1,0 +1,88 @@
+# Traffic prediction features (SPEC sections 21, 25, 33).
+#
+# Declared here so the model's inputs are a reviewable artifact rather than a
+# list buried in code. Every feature reads at or before the sample time t; the
+# leakage probe verifies that behaviourally, and a negative offset cannot even
+# be declared.
+
+target_metric: traffic_volume
+
+# How far ahead of the sample time the target sits. The trainer also runs a
+# 24h model via --horizon, so this is the default rather than the only value.
+horizon_hours: 1
+
+# Calendar features, derived from t alone -- they read no observations, so they
+# are the only features that are leakage-free by construction. Computed in the
+# source's LOCAL time, because "Friday evening" is a local-clock fact: in UTC
+# the planted 18:00-20:00 window sits at 12:30 and smears across two buckets.
+calendar:
+  - hour # the planted pattern is a sharp window, so the raw ordinal splits well
+  - hour_sin # and the cyclical pair handles the midnight wrap that hour cannot
+  - hour_cos
+  - weekday # left ordinal: the week's shape is not smooth, Sat/Sun break sharply
+  - is_weekend
+  - month
+  - month_sin # mild annual seasonality
+  - month_cos
+
+# Past values of the target, in hours before t. 168h is one week, which is what
+# lets the model see the weekly shape directly.
+lags: [1, 24, 168]
+
+# Lags anchored to the TARGET time, not the sample time: "the value at this time
+# last week". Without these, at a 1h horizon lag_168h reads last week's 17:00
+# when the target is 18:00 -- one hour off a sharp peak, which is why the
+# same-hour-last-week baseline beat the model on exactly that slice. Still
+# strictly backward-looking: the offset from the sample time is lag - horizon.
+seasonal_lags: [24, 168]
+
+# Means over the window ENDING at t. Smooths the noise a single lag carries.
+rolling_means: [3, 24, 168]
+
+# Rainfall is emitted by its own source for the city as a whole, so the model
+# has to join it by timestamp -- the conditional pattern is not handed over.
+covariates:
+  - metric: rainfall
+    location: CITY
+    offset_hours: 0
+  - metric: rainfall
+    location: CITY
+    window_hours: 24
+
+# The zone, as a categorical code. The planted congestion pattern is confined to
+# one zone, so without this the model cannot localize it.
+include_zone: true
+
+# NOTE: average_speed is deliberately absent. It would be a legitimate feature
+# (it is observed at or before t) and probably a strong one, but it is outside
+# this phase's declared scope. An obvious next addition.
+
+# Readable factor groups for explanations (SPEC section 27).
+#
+# The model has 19 columns; a person asking why a prediction is high wants six
+# factors, not a ranked list of lag offsets. Grouping lives here rather than in
+# code so that adding a feature forces a decision about how to explain it: the
+# loader rejects any feature that matches no group, and any that matches two.
+#
+# Patterns are matched with fnmatch against the feature name. Order does not
+# matter, because ambiguity is an error rather than a first-match win.
+factors:
+  historical traffic:
+    - lag_*
+    - seasonal_lag_*
+    - roll_mean_*
+  rainfall:
+    - rainfall_*
+  peak hour:
+    - hour
+    - hour_sin
+    - hour_cos
+  weekday:
+    - weekday
+    - is_weekend
+  season:
+    - month
+    - month_sin
+    - month_cos
+  location:
+    - zone

@@ -1,0 +1,131 @@
+name: CI
+
+# Lint, type checks and tests run on every push and pull request (SPEC section 41).
+# Any failing step fails the build; nothing is advisory.
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  # A new push supersedes an in-flight run on the same ref.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: lint / typecheck / test (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.11 is the project floor. Add newer versions here as they are adopted.
+        python-version: ["3.11"]
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            requirements*.txt
+
+      - name: Install the package and dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Lint (ruff)
+        run: python -m ruff check src tests scripts
+
+      - name: Check formatting (ruff)
+        run: python -m ruff format --check src tests scripts
+
+      - name: Type check (mypy, strict)
+        run: python -m mypy
+
+      # Split in two. The whole suite in one process exhausts memory on a
+      # modest runner: the experiment tests generate and replay several
+      # synthetic datasets, each holding a feature table and three models.
+      # Coverage is collected across both steps by appending.
+      - name: Test (pytest) -- everything except the experiment suite
+        run: >-
+          python -m pytest --ignore=tests/test_experiments.py
+          -p no:cacheprovider --cov --cov-report=term-missing
+
+      - name: Test (pytest) -- the experiment suite
+        run: >-
+          python -m pytest tests/test_experiments.py
+          -p no:cacheprovider --cov --cov-append --cov-report=term-missing
+          --cov-report=xml
+
+      - name: Verify the committed sample data regenerates identically
+        # The demo dataset is committed, so it must be reproducible from the
+        # seed. A drift between code and data would silently invalidate every
+        # ground-truth assertion in the suite.
+        run: |
+          python scripts/generate_demo_data.py --out data/sample --force
+          git diff --exit-code -- data/sample
+
+      - name: Verify the API and dashboard import
+        # streamlit is deliberately NOT installed here: it pulls pyarrow and
+        # pandas, which would dominate the install time and which no other part
+        # of the project imports. So the data layer is imported for real and
+        # app.py -- the only module that needs streamlit -- is compile-checked.
+        run: |
+          python -c "
+          from fastapi.testclient import TestClient
+          from urbansense.api import create_app
+          client = TestClient(create_app())
+          assert client.get('/health').status_code == 200
+          assert client.post('/models').status_code == 405, 'write method exposed'
+          print('API OK, read-only')
+          "
+          python -c "
+          from urbansense.dashboard import views, loaders
+          loader = loaders.ArtifactLoader()
+          assert views.readiness(loader), 'no artifact families reported'
+          print('dashboard data layer OK')
+          "
+          python -m compileall -q src/urbansense/dashboard/app.py
+
+      - name: Verify the demo scripts run standalone
+        # `make` is not required; the scripts are the real interface. A short
+        # smoke set rather than every script, to keep the run fast -- the
+        # pipeline itself is covered by the test suite.
+        run: |
+          python scripts/validate_demo.py --no-write --show-examples 0
+          python scripts/train_baseline.py --no-save
+          python scripts/serve_api.py --check
+          python scripts/run_experiment.py --seeds 20260101 --replay-days 45 --no-write
+
+      - name: Verify the shipped configuration actually loads
+        # A config file that parses in tests but not from a clean checkout would
+        # be a silent break; this exercises the real configs/ directory.
+        run: |
+          python -c "
+          from urbansense.config import load_settings
+          from urbansense.schemas import ProblemType
+          s = load_settings(env='ci')
+          assert s.enabled_problems == (ProblemType.TRAFFIC,), s.enabled_problems
+          m = s.resolve_metric(ProblemType.TRAFFIC, 'vehicle count')
+          assert m is not None and m.name == 'traffic_volume', m
+          print('configuration OK:', s.enabled_problems)
+          "
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-py${{ matrix.python-version }}
+          path: coverage.xml
+          if-no-files-found: ignore

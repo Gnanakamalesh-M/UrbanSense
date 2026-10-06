@@ -1,0 +1,17 @@
+# The demonstration dashboard (SPEC section 43).
+#
+# Separate from requirements.txt so an API-only or CI install stays light:
+# streamlit brings pandas, pyarrow, altair, pydeck and protobuf, none of which
+# anything else in this project imports.
+#
+# Equivalent to the [dashboard] extra in pyproject.toml:
+#   python -m pip install -e ".[dashboard]"
+-r requirements.txt
+
+# The charts (st.bar_chart, st.line_chart) and the zone map (st.map) come from
+# altair and pydeck, which streamlit bundles. No chart library is declared
+# separately, and none needs to be.
+#
+# Verified to resolve on Python 3.14 as streamlit 1.65.0 with cp314 wheels
+# throughout, and the floor is low enough for CI on 3.11.
+streamlit>=1.40

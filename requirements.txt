@@ -1,0 +1,28 @@
+# Runtime dependencies for the phases implemented so far.
+#
+# Deliberately minimal: each phase adds what it actually imports, so CI stays
+# fast and no unused pin rots. The ML/serving stack (pandas, scikit-learn, shap,
+# fastapi, streamlit) arrives with the phase that first needs it.
+pydantic>=2.7
+pyyaml>=6.0
+python-dotenv>=1.0
+
+# Phase 4: features and baseline prediction. scikit-learn's
+# HistGradientBoostingRegressor handles NaN natively, which is what lets missing
+# values stay missing rather than being imputed. numpy is used directly to
+# assemble the design matrix. No pandas: lag features are looked up by
+# timestamp, not row position, because the data has real gaps where quarantined
+# records were removed and a positional shift would silently cross them.
+scikit-learn>=1.5
+numpy>=1.26
+
+# Phase 5: pattern discovery. Already present via scikit-learn, but discovery
+# imports scipy.stats directly (Mann-Whitney U, Spearman), so it is declared
+# rather than relied on as a transitive dependency.
+scipy>=1.11
+
+# Phase 8: the read-only API layer (SPEC section 44). Floors chosen so CI on
+# 3.11 and a 3.14 machine both resolve. httpx is dev-only (TestClient's
+# transport) and lives in the [dev] extra rather than here.
+fastapi>=0.115
+uvicorn>=0.30

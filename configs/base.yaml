@@ -1,0 +1,91 @@
+# UrbanSense — run-wide configuration (SPEC sections 3, 12, 33, 39)
+#
+# Problem domains are listed here and defined in configs/problems/<name>.yaml.
+# v1 runs traffic only. To add flood or waste later, copy
+# configs/problems/_template.yaml, fill it in, and add its name below — no code
+# change is required.
+
+env: local
+project_name: UrbanSense
+
+problems:
+  - traffic
+
+paths:
+  # data/raw is append-only. Nothing in the codebase may overwrite or delete
+  # inside it; rejected records go to quarantine/ instead (SPEC sections 4A, 18).
+  data_root: data
+  raw: data/raw
+  processed: data/processed
+  external: data/external
+  sample: data/sample
+  quarantine: quarantine
+  models: models
+  reports: reports
+
+temporal:
+  # Stored instants are always UTC. This only affects human-facing output.
+  display_timezone: Asia/Kolkata
+  # How far ahead of now an event_time may sit before it is treated as a clock
+  # error or future-data leakage (SPEC section 33).
+  future_tolerance_minutes: 5
+  # Minimum gap between the newest feature observation and the prediction
+  # target, enforced by the leakage checks added in later phases.
+  min_prediction_gap_minutes: 0
+
+# Canonical location registry (SPEC section 13). Resolution is exact-only:
+# an id, name or curated alias matches, and anything else goes to review.
+locations_file: locations/chennai_zones.yaml
+
+validation:
+  # Document extractions below this confidence go to human review rather than
+  # becoming records (SPEC sections 34, 35).
+  min_document_confidence: 0.7
+  # Unknown units and locations are quarantined, never guessed at
+  # (SPEC sections 11, 13, 14).
+  quarantine_on_unknown_unit: true
+  quarantine_on_unknown_location: true
+
+  # --- sensor failure (SPEC section 17) --------------------------------------
+  # Identical consecutive readings before a run counts as a frozen sensor.
+  # Six hours of a byte-identical vehicle count is not a quiet road.
+  min_frozen_run: 6
+  # Values whose repetition is physically normal, so a run of them is NOT a
+  # frozen sensor. A rain gauge reading 0 mm through a dry month is working
+  # correctly; a detector pinned at 316 vehicles/hour for days is not. Long
+  # zero runs still face the outlier detector.
+  frozen_ignored_values: [0.0]
+  # Reporting gaps. A gap is measured and reported, never filled with zero.
+  source_warning_gap_hours: 2.0
+  source_failed_gap_hours: 6.0
+  # Missing-value rate above which a source is flagged even with no long gap.
+  source_warning_missing_rate: 0.10
+
+  # --- outliers (SPEC section 16) --------------------------------------------
+  # Deviations from the group median, in MAD units, before a value is flagged
+  # SUSPECT. Flagged rows are RETAINED: an outlier could be a festival, an
+  # accident or a diversion, and deleting it would destroy a real event.
+  # Conservative on purpose -- a flag is only useful if it is rare.
+  outlier_mad_threshold: 6.0
+  # Minimum comparison-group size before a group may judge anything.
+  outlier_min_group_size: 12
+
+  # --- recency (SPEC section 12) ---------------------------------------------
+  # Arrival lag bands. Beyond recent_within_hours the data is HISTORICAL and
+  # must never be presented as current, however it arrived.
+  current_within_hours: 2.0
+  recent_within_hours: 48.0
+
+# --- Reconciliation (SPEC sections 9, 10) -------------------------------------
+reconciliation:
+  # Two values are the same measurement when they differ by no more than
+  # max(absolute, relative * larger). Beyond that they materially disagree and
+  # the whole group becomes a CONFLICT with every value retained.
+  conflict_relative_tolerance: 0.02
+  # Floor, so two near-zero readings differing by a rounding step are not
+  # judged by ratio and reported as a 100% disagreement.
+  conflict_absolute_tolerance: 0.5
+  # How conflicts are settled. Only manual_review exists in v1, deliberately:
+  # any automatic winner is a policy choice, and a policy that discards the
+  # values it rejects destroys the evidence that it was the wrong policy.
+  conflict_policy: manual_review

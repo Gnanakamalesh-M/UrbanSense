@@ -1,0 +1,6 @@
+location_id,description,latitude,longitude,sensor_id
+ZONE-A,six-lane arterial corridor,13.082700,80.270700,sensor-A12
+ZONE-B,CBD approach - carries the Friday-evening pattern,13.060400,80.249600,sensor-B07
+ZONE-C,"residential collector - low volume, scattered feed gaps",13.035100,80.210000,sensor-C03
+ZONE-D,ring road - carries the frozen-sensor failure,13.110000,80.225000,sensor-D21
+CITY,city-wide rain gauge reference point,13.082700,80.270700,rain-gauge-01
